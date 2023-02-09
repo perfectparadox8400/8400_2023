@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Strafe_old")
 public class Strafe_old extends LinearOpMode {
@@ -14,6 +15,9 @@ public class Strafe_old extends LinearOpMode {
     private DcMotor right_back;
     private DcMotor inta1;
     private DcMotor inta2;
+    private DcMotor slide;
+    private Servo hand;
+
 
     /**
      * This function is executed when this Op Mode is selected from the Driver Station.
@@ -26,6 +30,10 @@ public class Strafe_old extends LinearOpMode {
         right_back = hardwareMap.get(DcMotor.class, "right_back");
         inta1 = hardwareMap.get(DcMotor.class, "inta1");
         inta2 = hardwareMap.get(DcMotor.class, "inta2");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+        hand = hardwareMap.get(Servo.class, "hand");
+        double power;
+        double power2;
 
         // You will have to determine which motor to reverse for your robot.
         // In this example, the right motor was reversed so that positive
@@ -42,24 +50,41 @@ public class Strafe_old extends LinearOpMode {
             while (opModeIsActive()) {
                 // The Y axis of a joystick ranges from -1 in its topmost position
                 // to +1 in its bottommost position. We negate this value so that
-                // the topmost position corresponds to maximum forward power.
-                left_front.setPower(-gamepad1.left_stick_y - (-gamepad1.left_stick_x + -gamepad1.right_stick_x));
-                right_front.setPower(-gamepad1.left_stick_y + -gamepad1.left_stick_x + -gamepad1.right_stick_x);
+                // the topmost position corresponds to maximum forward power
+                power = 2.5;
+                power2 = 0.4;
+                if (gamepad2.b|| gamepad1.b){
+                    power = 0.0000000000001;
+                }
+                if (gamepad2.y) {
+                    power = 1;
+                }
+                left_front.setPower(-gamepad1.left_stick_y/power - (-gamepad1.right_stick_x + -gamepad1.left_stick_x)/power);
+                right_front.setPower(-gamepad1.left_stick_y/power + -gamepad1.right_stick_x/power + -gamepad1.left_stick_x/power);
                 // The Y axis of a joystick ranges from -1 in its topmost position
                 // to +1 in its bottommost position. We negate this value so that
                 // the topmost position corresponds to maximum forward power.
-                left_back.setPower(-gamepad1.left_stick_y + -gamepad1.left_stick_x + gamepad1.right_stick_x);
-                right_back.setPower(-gamepad1.left_stick_y - (-gamepad1.left_stick_x - -gamepad1.right_stick_x));
-                if (gamepad1.dpad_right) {
-                } else if (gamepad1.dpad_left) {
+                left_back.setPower(-gamepad1.left_stick_y/power + -gamepad1.right_stick_x/power + gamepad1.left_stick_x/power);
+                right_back.setPower(-gamepad1.left_stick_y/power - (-gamepad1.right_stick_x - -gamepad1.left_stick_x)/power);
+                if (gamepad2.dpad_up) {
+                    slide.setPower(-1);
+                } else if (gamepad2.dpad_down) {
+                    slide.setPower(0.1);
+                } else{
+                    slide.setPower(-0.01);
+                }
+                if (gamepad2.x) {
+                    hand.setPosition(0.25);
+                } else if (gamepad2.a) {
+                    hand.setPosition(0.5);
                 }
                 // Intake
                 if (gamepad1.right_bumper) {
-                    inta1.setPower(1);
-                    inta2.setPower(1);
+                    inta1.setPower(power2);
+                    inta2.setPower(power2);
                 } else if (gamepad1.left_bumper) {
-                    inta1.setPower(-1);
-                    inta2.setPower(-1);
+                    inta1.setPower(-power2);
+                    inta2.setPower(-power2);
                 }else{
                     inta1.setPower(0);
                     inta2.setPower(0);

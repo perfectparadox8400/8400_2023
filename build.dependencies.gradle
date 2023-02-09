@@ -4,8 +4,6 @@ repositories {
     flatDir {
         dirs rootProject.file('libs')
     }
-    compile "com.google.zxing:core:3.3.0"
-    compile 'com.google.zxing:javase:3.3.0'
 }
 
 dependencies {
