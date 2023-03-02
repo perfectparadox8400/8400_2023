@@ -59,13 +59,13 @@ public class Strafe_old extends LinearOpMode {
                 if (gamepad2.y) {
                     power = 1;
                 }
-                left_front.setPower(-gamepad1.left_stick_y/power - (-gamepad1.right_stick_x + -gamepad1.left_stick_x)/power);
-                right_front.setPower(-gamepad1.left_stick_y/power + -gamepad1.right_stick_x/power + -gamepad1.left_stick_x/power);
+                left_front.setPower(gamepad1.left_stick_y/power + gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
+                right_front.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
                 // The Y axis of a joystick ranges from -1 in its topmost position
                 // to +1 in its bottommost position. We negate this value so that
                 // the topmost position corresponds to maximum forward power.
-                left_back.setPower(-gamepad1.left_stick_y/power + -gamepad1.right_stick_x/power + gamepad1.left_stick_x/power);
-                right_back.setPower(-gamepad1.left_stick_y/power - (-gamepad1.right_stick_x - -gamepad1.left_stick_x)/power);
+                left_back.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
+                right_back.setPower(-gamepad1.left_stick_y/power + gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
                 if (gamepad2.dpad_up) {
                     slide.setPower(-1);
                 } else if (gamepad2.dpad_down) {
