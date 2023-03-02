@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode.Drive;
+package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Strafe")
+@TeleOp(name = "Strafe_old")
 public class Strafe extends LinearOpMode {
 
     private DcMotor right_front;
@@ -15,6 +16,8 @@ public class Strafe extends LinearOpMode {
     private DcMotor inta1;
     private DcMotor inta2;
     private DcMotor slide;
+    private Servo hand;
+
 
     /**
      * This function is executed when this Op Mode is selected from the Driver Station.
@@ -28,62 +31,68 @@ public class Strafe extends LinearOpMode {
         inta1 = hardwareMap.get(DcMotor.class, "inta1");
         inta2 = hardwareMap.get(DcMotor.class, "inta2");
         slide = hardwareMap.get(DcMotor.class, "slide");
+        hand = hardwareMap.get(Servo.class, "hand");
+        double power;
+        double power2;
 
+        // You will have to determine which motor to reverse for your robot.
+        // In this example, the right motor was reversed so that positive
+        // applied power makes it move the robot in the forward direction.
         right_front.setDirection(DcMotorSimple.Direction.REVERSE);
         inta1.setDirection(DcMotorSimple.Direction.REVERSE);
+        // You will have to determine which motor to reverse for your robot.
+        // In this example, the right motor was reversed so that positive
+        // applied power makes it move the robot in the forward direction.
         left_front.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Initialize encoders
-        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        // Reverse one of the drive motors.
         waitForStart();
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                // Set target encoder positions and power for each motor
-                left_front.setTargetPosition((int) (-gamepad1.left_stick_y - (-gamepad1.left_stick_x + -gamepad1.right_stick_x)));
-                left_front.setPower(-gamepad1.left_stick_y - (-gamepad1.left_stick_x + -gamepad1.right_stick_x));
-                right_front.setTargetPosition((int) (-gamepad1.left_stick_y + -gamepad1.left_stick_x + -gamepad1.right_stick_x));
-                right_front.setPower(-gamepad1.left_stick_y + -gamepad1.left_stick_x + -gamepad1.right_stick_x);
-                left_back.setTargetPosition((int) (-gamepad1.left_stick_y + -gamepad1.left_stick_x + gamepad1.right_stick_x));
-                left_back.setPower(-gamepad1.left_stick_y + -gamepad1.left_stick_x + gamepad1.right_stick_x);
-                right_back.setTargetPosition((int) (-gamepad1.left_stick_y - (-gamepad1.left_stick_x - -gamepad1.right_stick_x)));
-                right_back.setPower(-gamepad1.left_stick_y - (-gamepad1.left_stick_x - -gamepad1.right_stick_x));
-
-                right_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                left_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                left_back.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                right_back.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                if (gamepad1.dpad_up) {
-                    slide.setPower(1);
-                } else if (gamepad1.dpad_down) {
-                    slide.setPower(-1);
-                } else{
-                    slide.setPower(0);
+                // The Y axis of a joystick ranges from -1 in its topmost position
+                // to +1 in its bottommost position. We negate this value so that
+                // the topmost position corresponds to maximum forward power
+                power = 2.5;
+                power2 = 0.4;
+                if (gamepad2.b|| gamepad1.b){
+                    power = 0.0000000000001;
                 }
-
+                if (gamepad2.y) {
+                    power = 1;
+                }
+                left_front.setPower(gamepad1.left_stick_y/power + gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
+                right_front.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
+                // The Y axis of a joystick ranges from -1 in its topmost position
+                // to +1 in its bottommost position. We negate this value so that
+                // the topmost position corresponds to maximum forward power.
+                left_back.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
+                right_back.setPower(-gamepad1.left_stick_y/power + gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
+                if (gamepad2.dpad_up) {
+                    slide.setPower(-1);
+                } else if (gamepad2.dpad_down) {
+                    slide.setPower(1);
+                } else{
+                    //slide.setPower(-0.01);
+                }
+                if (gamepad2.x) {
+                    hand.setPosition(0.25);
+                } else if (gamepad2.a) {
+                    hand.setPosition(0.5);
+                }
                 // Intake
                 if (gamepad1.right_bumper) {
-                    inta1.setPower(1);
-                    inta2.setPower(1);
+                    inta1.setPower(power2);
+                    inta2.setPower(power2);
                 } else if (gamepad1.left_bumper) {
-                    inta1.setPower(-1);
-                    inta2.setPower(-1);
-                } else {
+                    inta1.setPower(-power2);
+                    inta2.setPower(-power2);
+                }else{
                     inta1.setPower(0);
                     inta2.setPower(0);
                 }
-                telemetry.addData("LF Encoder", left_front.getCurrentPosition());
-                telemetry.addData("LB Encoder", left_back.getCurrentPosition());
-                telemetry.addData("RF Encoder", right_front.getCurrentPosition());
-                telemetry.addData("RB Encoder", right_back.getCurrentPosition());
+                telemetry.addData("LF POW", left_front.getPower());
+                telemetry.addData("LB POW", left_back.getPower());
+                telemetry.addData("RF POW", right_front.getPower());
+                telemetry.addData("RB POW", right_back.getPower());
                 telemetry.update();
             }
         }

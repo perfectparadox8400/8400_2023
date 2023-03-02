@@ -19,14 +19,14 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Auto.HardwarePushbot;
+import org.firstinspires.ftc.teamcode.drive.HardwarePushbot;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -34,7 +34,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import org.firstinspires.ftc.teamcode.Auto.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 
 import java.util.ArrayList;
 
