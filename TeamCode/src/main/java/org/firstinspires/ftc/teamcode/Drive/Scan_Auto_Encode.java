@@ -31,29 +31,34 @@ import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
+/*
+ * This is a simple routine to test translational drive capabilities.
+ */
 import java.util.ArrayList;
-
+@Config
 @Autonomous(name="Scan Auto - Encoders")
 public class Scan_Auto_Encode extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
-    private MecanumDrive drive;
-    public DcMotor  leftFront   = null;
-    public DcMotor  rightFront = null;
-    public DcMotor  rightRear  = null;
-    public DcMotor  leftRear  = null;
+
     //private ElapsedTime runtime = new ElapsedTime();
 
 
     //static final double     FORWARD_SPEED = 0.4;
     //static final double     TURN_SPEED    = 0.3;
-    //static final double FEET_PER_METER = 3.28084;
+    static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
     // UNITS ARE PIXELS
@@ -96,30 +101,14 @@ public class Scan_Auto_Encode extends LinearOpMode
 
             }
         });
-        // Initialize motors
-        leftFront = hardwareMap.get(DcMotor.class, "left_front");
-        leftRear = hardwareMap.get(DcMotor.class, "left_back");
-        rightRear = hardwareMap.get(DcMotor.class, "right_back");
-        rightFront = hardwareMap.get(DcMotor.class, "right_front");
-
-        // Reverse the right motors
-        leftRear.setDirection(DcMotor.Direction.REVERSE);
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
-        telemetry.setMsTransmissionInterval(50);
-        MecanumDrive.init(hardwareMap);
-//https://github.com/acmerobotics/road-runner-quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/SampleMecanumDrive.java
-
-        // Initialize the RoadRunner MecanumDrive object
-        drive = new MecanumDrive(
-                DriveConstants.TRACK_WIDTH,
-                DriveConstants.LATERAL_MULTIPLIER,
-                DriveConstants.COUNTS_PER_INCH,
-                leftFront, leftRear, rightRear, rightFront
-        );
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
+        Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
         /*
          * The INIT-loop:
          * This REPLACES waitForStart!
@@ -209,18 +198,44 @@ public class Scan_Auto_Encode extends LinearOpMode
                             .forward(24) // one square is 24 inches
                             .build()
             );
-
             // Stop the robot
             drive.setMotorPowers(0, 0, 0, 0);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
+                            .forward(24) // one square is 24 inches
+                            .strafeLeft(24)
+                            .build()
+            );
+            // Stop the robot
+            drive.setMotorPowers(0, 0, 0, 0);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
+                            .forward(24) // one square is 24 inches
+                            .build()
+            );
+            // Stop the robot
+            drive.setMotorPowers(0, 0, 0, 0);
         }else{
             //right trajectory
-
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
+                            .forward(24) // one square is 24 inches
+                            .strafeRight(24)
+                            .build()
+            );
+            // Stop the robot
+            drive.setMotorPowers(0, 0, 0, 0);
         }
 
+        Pose2d poseEstimate = drive.getPoseEstimate();
+        telemetry.addData("finalX", poseEstimate.getX());
+        telemetry.addData("finalY", poseEstimate.getY());
+        telemetry.addData("finalHeading", poseEstimate.getHeading());
+        telemetry.update();
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         //while (opModeIsActive()) {sleep(20);}
