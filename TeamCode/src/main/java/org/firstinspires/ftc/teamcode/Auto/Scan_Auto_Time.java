@@ -43,8 +43,8 @@ public class Scan_Auto_Time extends LinearOpMode
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = -0.6;
-    static final double     TURN_SPEED    = 0.5;
+    static final double     FORWARD_SPEED = 0.4;
+    static final double     TURN_SPEED    = 0.3;
     static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
@@ -60,9 +60,9 @@ public class Scan_Auto_Time extends LinearOpMode
     double tagsize = 0.166;
 
     // Tag ID 1,2,3 from the 36h11 family
-    int LEFT = 1;
-    int MIDDLE = 2;
-    int RIGHT = 3;
+    int LEFT = 0;
+    int MIDDLE = 1;
+    int RIGHT = 2;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -183,31 +183,67 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
-        }else if(tagOfInterest.id == MIDDLE){
             robot.leftDrive.setPower(FORWARD_SPEED);
             robot.rightDrive.setPower(FORWARD_SPEED);
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
+            robot.leftDrive.setPower(TURN_SPEED);
+        robot.rightDrive.setPower(-TURN_SPEED);
+        robot.bleftDrive.setPower(-TURN_SPEED);
+        robot.brightDrive.setPower(TURN_SPEED);
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < 1.2)) {
+            telemetry.addData("Path", "Leg 2: %2.5f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+        }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
+            robot.leftDrive.setPower(FORWARD_SPEED);
+            robot.rightDrive.setPower(FORWARD_SPEED);
+            robot.bleftDrive.setPower(FORWARD_SPEED);
+            robot.brightDrive.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+                telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
         }else{
             //right trajectory
+            robot.leftDrive.setPower(FORWARD_SPEED);
+            robot.rightDrive.setPower(FORWARD_SPEED);
+            robot.bleftDrive.setPower(FORWARD_SPEED);
+            robot.brightDrive.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+                telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.leftDrive.setPower(-TURN_SPEED);
+            robot.rightDrive.setPower(TURN_SPEED);
+            robot.bleftDrive.setPower(TURN_SPEED);
+            robot.brightDrive.setPower(-TURN_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 1.2)) {
+                telemetry.addData("Path", "Leg 2: %2.5f 3S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
         }
 
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
+        //while (opModeIsActive()) {sleep(20);}
     }
 
     void tagToTelemetry(AprilTagDetection detection)
