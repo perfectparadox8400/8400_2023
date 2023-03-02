@@ -205,6 +205,10 @@ public class Scan_Auto_Encode extends LinearOpMode
             drive.followTrajectory(
                     drive.trajectoryBuilder(new Pose2d())
                             .forward(24) // one square is 24 inches
+                            .build()
+            );
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
                             .strafeLeft(24)
                             .build()
             );
@@ -224,6 +228,10 @@ public class Scan_Auto_Encode extends LinearOpMode
             drive.followTrajectory(
                     drive.trajectoryBuilder(new Pose2d())
                             .forward(24) // one square is 24 inches
+                            .build()
+            );
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
                             .strafeRight(24)
                             .build()
             );
