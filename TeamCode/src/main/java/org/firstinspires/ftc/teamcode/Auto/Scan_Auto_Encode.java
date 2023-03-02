@@ -1,311 +1,239 @@
+/*
+ * Copyright (c) 2021 OpenFTC Team
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.firstinspires.ftc.teamcode.Auto;
 
-import androidx.annotation.NonNull;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
-import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
-import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Auto.HardwarePushbot;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.Auto.DriveConstants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
+@Autonomous(name="Scan Auto - Encoders")
+public class Scan_Auto_Encode extends LinearOpMode
+{
+    OpenCvCamera camera;
+    AprilTagDetectionPipeline aprilTagDetectionPipeline;
+    private MecanumDrive drive;
+    public DcMotor  leftFront   = null;
+    public DcMotor  rightFront = null;
+    public DcMotor  rightRear  = null;
+    public DcMotor  leftRear  = null;
+    //private ElapsedTime runtime = new ElapsedTime();
 
-/*
- * Simple mecanum drive hardware implementation for REV hardware.
- */
-@Config
-public class Scan_Auto_Encode extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    //static final double     FORWARD_SPEED = 0.4;
+    //static final double     TURN_SPEED    = 0.3;
+    //static final double FEET_PER_METER = 3.28084;
 
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
+    // Lens intrinsics
+    // UNITS ARE PIXELS
+    // NOTE: this calibration is for the C920 webcam at 800x448.
+    // You will need to do your own calibration for other configurations!
+    double fx = 578.272;
+    double fy = 578.272;
+    double cx = 402.145;
+    double cy = 221.506;
 
-    private TrajectorySequenceRunner trajectorySequenceRunner;
+    // UNITS ARE METERS
+    double tagsize = 0.166;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
-    private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
+    // Tag ID 1,2,3 from the 36h11 family
+    int LEFT = 0;
+    int MIDDLE = 1;
+    int RIGHT = 2;
 
-    private TrajectoryFollower follower;
-
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
-    private List<DcMotorEx> motors;
-
-    private IMU imu;
-    private VoltageSensor batteryVoltageSensor;
-
-    private List<Integer> lastEncPositions = new ArrayList<>();
-    private List<Integer> lastEncVels = new ArrayList<>();
-
-    public Scan_Auto_Encode(HardwareMap hardwareMap) {
-        super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
-
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
-
-        LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
-
-        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
-
-        // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
-        imu.initialize(parameters);
-
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
-
-        for (DcMotorEx motor : motors) {
-            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
-            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
-            motor.setMotorType(motorConfigurationType);
-        }
-
-        if (RUN_USING_ENCODER) {
-            setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
-            setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
-        }
-
-        // TODO: reverse any motors using DcMotor.setDirection()
-
-        List<Integer> lastTrackingEncPositions = new ArrayList<>();
-        List<Integer> lastTrackingEncVels = new ArrayList<>();
-
-        // TODO: if desired, use setLocalizer() to change the localization method
-        // setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
-
-        trajectorySequenceRunner = new TrajectorySequenceRunner(
-                follower, HEADING_PID, batteryVoltageSensor,
-                lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
-        );
-    }
-
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
-        return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
-    }
-
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
-        return new TrajectoryBuilder(startPose, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
-    }
-
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
-        return new TrajectoryBuilder(startPose, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
-    }
-
-    public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
-        return new TrajectorySequenceBuilder(
-                startPose,
-                VEL_CONSTRAINT, ACCEL_CONSTRAINT,
-                MAX_ANG_VEL, MAX_ANG_ACCEL
-        );
-    }
-
-    public void turnAsync(double angle) {
-        trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(getPoseEstimate())
-                        .turn(angle)
-                        .build()
-        );
-    }
-
-    public void turn(double angle) {
-        turnAsync(angle);
-        waitForIdle();
-    }
-
-    public void followTrajectoryAsync(Trajectory trajectory) {
-        trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(trajectory.start())
-                        .addTrajectory(trajectory)
-                        .build()
-        );
-    }
-
-    public void followTrajectory(Trajectory trajectory) {
-        followTrajectoryAsync(trajectory);
-        waitForIdle();
-    }
-
-    public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
-        trajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
-    }
-
-    public void followTrajectorySequence(TrajectorySequence trajectorySequence) {
-        followTrajectorySequenceAsync(trajectorySequence);
-        waitForIdle();
-    }
-
-    public Pose2d getLastError() {
-        return trajectorySequenceRunner.getLastPoseError();
-    }
-
-    public void update() {
-        updatePoseEstimate();
-        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
-        if (signal != null) setDriveSignal(signal);
-    }
-
-    public void waitForIdle() {
-        while (!Thread.currentThread().isInterrupted() && isBusy())
-            update();
-    }
-
-    public boolean isBusy() {
-        return trajectorySequenceRunner.isBusy();
-    }
-
-    public void setMode(DcMotor.RunMode runMode) {
-        for (DcMotorEx motor : motors) {
-            motor.setMode(runMode);
-        }
-    }
-
-    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
-        for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(zeroPowerBehavior);
-        }
-    }
-
-    public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
-        PIDFCoefficients compensatedCoefficients = new PIDFCoefficients(
-                coefficients.p, coefficients.i, coefficients.d,
-                coefficients.f * 12 / batteryVoltageSensor.getVoltage()
-        );
-
-        for (DcMotorEx motor : motors) {
-            motor.setPIDFCoefficients(runMode, compensatedCoefficients);
-        }
-    }
-
-    public void setWeightedDrivePower(Pose2d drivePower) {
-        Pose2d vel = drivePower;
-
-        if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
-                + Math.abs(drivePower.getHeading()) > 1) {
-            // re-normalize the powers according to the weights
-            double denom = VX_WEIGHT * Math.abs(drivePower.getX())
-                    + VY_WEIGHT * Math.abs(drivePower.getY())
-                    + OMEGA_WEIGHT * Math.abs(drivePower.getHeading());
-
-            vel = new Pose2d(
-                    VX_WEIGHT * drivePower.getX(),
-                    VY_WEIGHT * drivePower.getY(),
-                    OMEGA_WEIGHT * drivePower.getHeading()
-            ).div(denom);
-        }
-
-        setDrivePower(vel);
-    }
-
-    @NonNull
-    @Override
-    public List<Double> getWheelPositions() {
-        lastEncPositions.clear();
-
-        List<Double> wheelPositions = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int position = motor.getCurrentPosition();
-            lastEncPositions.add(position);
-            wheelPositions.add(encoderTicksToInches(position));
-        }
-        return wheelPositions;
-    }
+    AprilTagDetection tagOfInterest = null;
 
     @Override
-    public List<Double> getWheelVelocities() {
-        lastEncVels.clear();
+    public void runOpMode()
+    {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
-        List<Double> wheelVelocities = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int vel = (int) motor.getVelocity();
-            lastEncVels.add(vel);
-            wheelVelocities.add(encoderTicksToInches(vel));
+        camera.setPipeline(aprilTagDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
+        // Initialize motors
+        leftFront = hardwareMap.get(DcMotor.class, "left_front");
+        leftRear = hardwareMap.get(DcMotor.class, "left_back");
+        rightRear = hardwareMap.get(DcMotor.class, "right_back");
+        rightFront = hardwareMap.get(DcMotor.class, "right_front");
+
+        // Reverse the right motors
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        telemetry.setMsTransmissionInterval(50);
+        MecanumDrive.init(hardwareMap);
+//https://github.com/acmerobotics/road-runner-quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/SampleMecanumDrive.java
+
+        // Initialize the RoadRunner MecanumDrive object
+        drive = new MecanumDrive(
+                DriveConstants.TRACK_WIDTH,
+                DriveConstants.LATERAL_MULTIPLIER,
+                DriveConstants.COUNTS_PER_INCH,
+                leftFront, leftRear, rightRear, rightFront
+        );
+
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Ready to run");    //
+        telemetry.update();
+        /*
+         * The INIT-loop:
+         * This REPLACES waitForStart!
+         */
+        while (!isStarted() && !isStopRequested())
+        {
+            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+
+            if(currentDetections.size() != 0)
+            {
+                boolean tagFound = false;
+
+                for(AprilTagDetection tag : currentDetections)
+                {
+                    if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT)
+                    {
+                        tagOfInterest = tag;
+                        tagFound = true;
+                        break;
+                    }
+                }
+
+                if(tagFound)
+                {
+                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                    tagToTelemetry(tagOfInterest);
+                }
+                else
+                {
+                    telemetry.addLine("Don't see tag of interest :(");
+
+                    if(tagOfInterest == null)
+                    {
+                        telemetry.addLine("(The tag has never been seen)");
+                    }
+                    else
+                    {
+                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                }
+
+            }
+            else
+            {
+                telemetry.addLine("Don't see tag of interest :(");
+
+                if(tagOfInterest == null)
+                {
+                    telemetry.addLine("(The tag has never been seen)");
+                }
+                else
+                {
+                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                    tagToTelemetry(tagOfInterest);
+                }
+
+            }
+
+            telemetry.update();
+            sleep(20);
         }
-        return wheelVelocities;
+
+        /*
+         * The START command just came in: now work off the latest snapshot acquired
+         * during the init loop.
+         */
+
+        /* Update the telemetry */
+        if(tagOfInterest != null)
+        {
+            telemetry.addLine("Tag snapshot:\n");
+            tagToTelemetry(tagOfInterest);
+            telemetry.update();
+        }
+        else
+        {
+            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
+            telemetry.update();
+        }
+
+        /* Actually do something useful */
+        if(tagOfInterest == null){
+            //default trajectory here if preferred
+            drive.followTrajectory(
+                    drive.trajectoryBuilder(new Pose2d())
+                            .forward(24) // one square is 24 inches
+                            .build()
+            );
+
+            // Stop the robot
+            drive.setMotorPowers(0, 0, 0, 0);
+        }else if(tagOfInterest.id == LEFT){
+            //left trajectory
+        }else if(tagOfInterest.id == MIDDLE){
+            //middle trajectory
+        }else{
+            //right trajectory
+
+        }
+
+
+        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
+        //while (opModeIsActive()) {sleep(20);}
     }
 
-    @Override
-    public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
-    }
-
-    @Override
-    public double getRawExternalHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-    }
-
-    @Override
-    public Double getExternalHeadingVelocity() {
-        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
-    }
-
-    public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
-        return new MinVelocityConstraint(Arrays.asList(
-                new AngularVelocityConstraint(maxAngularVel),
-                new MecanumVelocityConstraint(maxVel, trackWidth)
-        ));
-    }
-
-    public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
-        return new ProfileAccelerationConstraint(maxAccel);
+    void tagToTelemetry(AprilTagDetection detection)
+    {
+        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
     }
 }
