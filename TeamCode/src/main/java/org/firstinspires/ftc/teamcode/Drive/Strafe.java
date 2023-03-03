@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive;
+package org.firstinspires.ftc.teamcode.Drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Strafe_old")
+@TeleOp(name = "Strafe")
 public class Strafe extends LinearOpMode {
 
     private DcMotor right_front;
@@ -60,18 +60,18 @@ public class Strafe extends LinearOpMode {
                     power = 1;
                 }
                 left_front.setPower(gamepad1.left_stick_y/power + gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
-                right_front.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
+                right_front.setPower(gamepad1.left_stick_y/power - gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
                 // The Y axis of a joystick ranges from -1 in its topmost position
                 // to +1 in its bottommost position. We negate this value so that
                 // the topmost position corresponds to maximum forward power.
-                left_back.setPower(-gamepad1.left_stick_y/power - gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
-                right_back.setPower(-gamepad1.left_stick_y/power + gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
+                left_back.setPower(gamepad1.left_stick_y/power - gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
+                right_back.setPower(gamepad1.left_stick_y/power + gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
                 if (gamepad2.dpad_up) {
                     slide.setPower(-1);
                 } else if (gamepad2.dpad_down) {
                     slide.setPower(1);
                 } else{
-                    //slide.setPower(-0.01);
+                    slide.setPower(-0.01);
                 }
                 if (gamepad2.x) {
                     hand.setPosition(0.25);
