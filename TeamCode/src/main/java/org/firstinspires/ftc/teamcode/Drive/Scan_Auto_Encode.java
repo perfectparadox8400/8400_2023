@@ -54,7 +54,7 @@ public class Scan_Auto_Encode extends LinearOpMode
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
-    //private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
 
     //static final double     FORWARD_SPEED = 0.4;
@@ -212,50 +212,16 @@ public class Scan_Auto_Encode extends LinearOpMode
         /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .forward(24) // one square is 24 inches
-                            .build()
-            );
-            // Stop the robot
-            drive.setMotorPowers(0, 0, 0, 0);
+            drive.followTrajectorySequence(traj2);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .forward(24) // one square is 24 inches
-                            .build()
-            );
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .strafeLeft(24)
-                            .build()
-            );
-            // Stop the robot
-            drive.setMotorPowers(0, 0, 0, 0);
+            drive.followTrajectorySequence(traj1);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .forward(24) // one square is 24 inches
-                            .build()
-            );
-            // Stop the robot
-            drive.setMotorPowers(0, 0, 0, 0);
+            drive.followTrajectorySequence(traj2);
         }else{
             //right trajectory
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .forward(24) // one square is 24 inches
-                            .build()
-            );
-            drive.followTrajectory(
-                    drive.trajectoryBuilder(new Pose2d())
-                            .strafeRight(24)
-                            .build()
-            );
-            // Stop the robot
-            drive.setMotorPowers(0, 0, 0, 0);
+            drive.followTrajectorySequence(traj3);
         }
 
         Pose2d poseEstimate = drive.getPoseEstimate();
