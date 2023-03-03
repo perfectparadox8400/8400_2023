@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.HardwarePushbot;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -105,10 +106,28 @@ public class Scan_Auto_Encode extends LinearOpMode
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
-        Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Pose2d startPose = new Pose2d(0, 0, 0);
 
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(startPose)
+                .forward(24)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(-90))
+                .waitSeconds(0.5)
+                .forward(24)
+                .build();
+        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(startPose)
+                .forward(24)
+                .build();
+        TrajectorySequence traj3 = drive.trajectorySequenceBuilder(startPose)
+                .forward(24)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(90))
+                .waitSeconds(0.5)
+                .forward(24)
+                .build();
         /*
          * The INIT-loop:
          * This REPLACES waitForStart!
