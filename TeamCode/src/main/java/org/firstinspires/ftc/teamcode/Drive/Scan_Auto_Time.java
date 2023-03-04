@@ -43,7 +43,7 @@ public class Scan_Auto_Time extends LinearOpMode
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = 0.4;
+    static final double     FORWARD_SPEED = -0.4;
     static final double     TURN_SPEED    = 0.3;
     static final double FEET_PER_METER = 3.28084;
 
@@ -204,10 +204,19 @@ public class Scan_Auto_Time extends LinearOpMode
         robot.bleftDrive.setPower(-TURN_SPEED);
         robot.brightDrive.setPower(TURN_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.2)) {
+        while (opModeIsActive() && (runtime.seconds() < 1.1)) {
             telemetry.addData("Path", "Leg 2: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+        robot.leftDrive.setPower(FORWARD_SPEED);
+            robot.rightDrive.setPower(FORWARD_SPEED);
+            robot.bleftDrive.setPower(FORWARD_SPEED);
+            robot.brightDrive.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+                telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
             robot.leftDrive.setPower(FORWARD_SPEED);
@@ -235,8 +244,17 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(TURN_SPEED);
             robot.brightDrive.setPower(-TURN_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 1.2)) {
+            while (opModeIsActive() && (runtime.seconds() < 1.1)) {
                 telemetry.addData("Path", "Leg 2: %2.5f 3S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.leftDrive.setPower(FORWARD_SPEED);
+            robot.rightDrive.setPower(FORWARD_SPEED);
+            robot.bleftDrive.setPower(FORWARD_SPEED);
+            robot.brightDrive.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+                telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
         }
