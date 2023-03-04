@@ -209,8 +209,8 @@ public class Scan_Auto_Encode extends LinearOpMode
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
-
-        /* Actually do something useful */
+        while (opModeIsActive() && !isStopRequested()) {
+            /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
             drive.followTrajectorySequence(traj2);
@@ -223,8 +223,8 @@ public class Scan_Auto_Encode extends LinearOpMode
         }else{
             //right trajectory
             drive.followTrajectorySequence(traj3);
+        }   
         }
-
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         //while (opModeIsActive()) {sleep(20);}
