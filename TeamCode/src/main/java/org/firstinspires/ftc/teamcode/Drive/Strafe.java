@@ -77,7 +77,7 @@ public class Strafe extends LinearOpMode {
                 }
 
                 if (gamepad2.x) {
-                    hand.setPosition(0.45);
+                    hand.setPosition(0.9);
                 } else if (gamepad2.a) {
                     hand.setPosition(0.7);
                 }
