@@ -183,7 +183,7 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
@@ -195,12 +195,12 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
-            robot.leftDrive.setPower(TURN_SPEED);
-        robot.rightDrive.setPower(-TURN_SPEED);
+            robot.leftDrive.setPower(-TURN_SPEED);
+        robot.rightDrive.setPower(TURN_SPEED);
         robot.bleftDrive.setPower(-TURN_SPEED);
         robot.brightDrive.setPower(TURN_SPEED);
         runtime.reset();
@@ -213,7 +213,7 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
@@ -224,7 +224,7 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
@@ -235,12 +235,12 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
-            robot.leftDrive.setPower(-TURN_SPEED);
-            robot.rightDrive.setPower(TURN_SPEED);
+            robot.leftDrive.setPower(TURN_SPEED);
+            robot.rightDrive.setPower(-TURN_SPEED);
             robot.bleftDrive.setPower(TURN_SPEED);
             robot.brightDrive.setPower(-TURN_SPEED);
             runtime.reset();
@@ -253,7 +253,7 @@ public class Scan_Auto_Time extends LinearOpMode
             robot.bleftDrive.setPower(FORWARD_SPEED);
             robot.brightDrive.setPower(FORWARD_SPEED);
             runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.95)) {
+            while (opModeIsActive() && (runtime.seconds() < 0.7)) {
                 telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
