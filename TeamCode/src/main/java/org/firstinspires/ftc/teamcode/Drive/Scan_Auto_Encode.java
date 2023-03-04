@@ -54,7 +54,7 @@ public class Scan_Auto_Encode extends LinearOpMode
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
-    private ElapsedTime runtime = new ElapsedTime();
+    //private ElapsedTime runtime = new ElapsedTime();
 
 
     //static final double     FORWARD_SPEED = 0.4;
@@ -106,6 +106,7 @@ public class Scan_Auto_Encode extends LinearOpMode
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPose = new Pose2d(0, 0, 0);
 
@@ -114,7 +115,7 @@ public class Scan_Auto_Encode extends LinearOpMode
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(24)
                 .waitSeconds(0.5)
-                .turn(Math.toRadians(-90))
+                .turn(Math.toRadians(90))
                 .waitSeconds(0.5)
                 .forward(24)
                 .build();
@@ -124,7 +125,7 @@ public class Scan_Auto_Encode extends LinearOpMode
         TrajectorySequence traj3 = drive.trajectorySequenceBuilder(startPose)
                 .forward(24)
                 .waitSeconds(0.5)
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(90) - 1e-6)
                 .waitSeconds(0.5)
                 .forward(24)
                 .build();
@@ -224,11 +225,6 @@ public class Scan_Auto_Encode extends LinearOpMode
             drive.followTrajectorySequence(traj3);
         }
 
-        Pose2d poseEstimate = drive.getPoseEstimate();
-        telemetry.addData("finalX", poseEstimate.getX());
-        telemetry.addData("finalY", poseEstimate.getY());
-        telemetry.addData("finalHeading", poseEstimate.getHeading());
-        telemetry.update();
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         //while (opModeIsActive()) {sleep(20);}

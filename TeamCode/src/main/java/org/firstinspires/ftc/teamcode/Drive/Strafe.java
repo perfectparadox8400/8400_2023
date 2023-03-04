@@ -66,6 +66,7 @@ public class Strafe extends LinearOpMode {
                 // the topmost position corresponds to maximum forward power.
                 left_back.setPower(gamepad1.left_stick_y/power - gamepad1.left_stick_x/power + gamepad1.right_stick_x/power);
                 right_back.setPower(gamepad1.left_stick_y/power + gamepad1.left_stick_x/power - gamepad1.right_stick_x/power);
+                
                 if (gamepad2.dpad_up) {
                     slide.setPower(-1);
                 } else if (gamepad2.dpad_down) {
