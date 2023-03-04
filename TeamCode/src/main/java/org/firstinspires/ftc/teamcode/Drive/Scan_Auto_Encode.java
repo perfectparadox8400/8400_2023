@@ -213,17 +213,25 @@ public class Scan_Auto_Encode extends LinearOpMode
             /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
+            telemetry.addLine("Going Middle:\n");
+            telemetry.update(); 
             drive.followTrajectorySequence(traj2);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
+            telemetry.addLine("Going Left:\n");
+            telemetry.update(); 
             drive.followTrajectorySequence(traj1);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
+            telemetry.addLine("Going Middle:\n");
+            telemetry.update(); 
             drive.followTrajectorySequence(traj2);
         }else{
             //right trajectory
+            telemetry.addLine("Going Right:\n");
+            telemetry.update(); 
             drive.followTrajectorySequence(traj3);
-        }   
+        }  
         }
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
