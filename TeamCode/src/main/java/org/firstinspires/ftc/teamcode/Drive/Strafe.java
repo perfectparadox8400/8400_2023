@@ -78,9 +78,9 @@ public class Strafe extends LinearOpMode {
                 }
 
                 if (gamepad2.x) {
-                    hand.setPosition(0.9);
+                    hand.setPosition(0.55);
                 } else if (gamepad2.a) {
-                    hand.setPosition(1.2);
+                    hand.setPosition(0.7);
                 }
                 // Intake
                 if (gamepad1.right_bumper) {
