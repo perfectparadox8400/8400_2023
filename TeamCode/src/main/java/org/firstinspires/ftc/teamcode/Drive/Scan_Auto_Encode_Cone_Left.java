@@ -39,8 +39,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Scan Auto - Encoder OLD")
-public class Scan_Auto_Encoder_OLD extends LinearOpMode
+@Autonomous(name="Scan Auto - Encoder Cone Left")
+public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -113,11 +113,13 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.bleftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.brightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         robot.bleftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.brightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0",  "Starting at %7d :%7d :%7d :%7d",
@@ -125,6 +127,8 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
                 robot.rightDrive.getCurrentPosition(),
                 robot.bleftDrive.getCurrentPosition(),
                 robot.brightDrive.getCurrentPosition());
+        telemetry.addData("slide",  "Starting at %7d",
+                robot.slide.getCurrentPosition());
         telemetry.update();
         /*
          * The INIT-loop:
@@ -206,36 +210,48 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
-
+        robot.hand.setPosition(0.5);
         /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
-            encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
+            encoderDrive(DRIVE_SPEED,  -28,  -28, 5.0);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
             encoderDrive(TURN_SPEED,   48, -48, 4.0);
-            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(DRIVE_SPEED,  -6,  -6, 5.0);
-            encoderDrive(TURN_SPEED,   6, -6, 4.0);
+            encoderSlide(1, -2, 5.0);
+            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+            robot.hand.setPosition(1);
+            encoderSlide(0.8, 2, 5.0);
+            robot.slide.setPower(0);
+            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
+            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
             encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(TURN_SPEED,   60, -60, 4.0);
-            encoderDrive(DRIVE_SPEED,  -4,  -4, 5.0);
-            encoderDrive(DRIVE_SPEED,  4,  4, 5.0);
-            encoderDrive(TURN_SPEED,   6, -6, 4.0);
+            encoderDrive(TURN_SPEED,   48, -48, 4.0);
+            encoderSlide(1, -2, 5.0);
+            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+            robot.hand.setPosition(1);
+            encoderSlide(0.8, 2, 5.0);
+            robot.slide.setPower(0);
+            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
+            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
         }else{
             //right trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(TURN_SPEED,   60, -60, 4.0);
-            encoderDrive(DRIVE_SPEED,  -4,  -4, 5.0);
-            encoderDrive(DRIVE_SPEED,  4,  4, 5.0);
-            encoderDrive(TURN_SPEED,   6, -6, 4.0);
+            encoderDrive(TURN_SPEED,   48, -48, 4.0);
+            encoderSlide(1, -2, 5.0);
+            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+            robot.hand.setPosition(1);
+            encoderSlide(0.8, 2, 5.0);
+            robot.slide.setPower(0);
+            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
+            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
             encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
         }
         telemetry.addData("Path", "Complete");
@@ -298,12 +314,61 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
             // Stop all motion;
             robot.leftDrive.setPower(0);
             robot.rightDrive.setPower(0);
+            robot.bleftDrive.setPower(0);
+            robot.brightDrive.setPower(0);
 
             // Turn off RUN_TO_POSITION
             robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bleftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.brightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            //  sleep(250);   // optional pause after each move
+            sleep(250);   // optional pause after each move
+        }
+    }
+    public void encoderSlide(double speed,
+                             double rotations
+                             double timeoutS) {
+        int newTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newTarget = robot.slide.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            robot.slide.setTargetPosition(newTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.slide.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.slide.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("slide",  "Running to %7d", newTarget);
+                telemetry.addData("slide",  "Running at %7d",
+                        robot.slide.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.slide.setPower(-0.01);
+
+            // Turn off RUN_TO_POSITION
+            robot.slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move
         }
     }
     void tagToTelemetry(AprilTagDetection detection)

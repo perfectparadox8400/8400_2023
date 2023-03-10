@@ -27,38 +27,33 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.HardwarePushbot;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Drive.SampleMecanumDrive;
-
-/*
- * This is a simple routine to test translational drive capabilities.
- */
 import java.util.ArrayList;
 
-@Autonomous(name="Scan Auto - Encoders")
-public class Scan_Auto_Encode extends LinearOpMode
+@Autonomous(name="Scan Auto - Encoder Normal")
+public class Scan_Auto_Encoder_OLD extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
+    HardwarePushbot         robot   = new HardwarePushbot();   // Use a Pushbot's hardware
+    private ElapsedTime     runtime = new ElapsedTime();
 
-    //private ElapsedTime runtime = new ElapsedTime();
-
-
-    //static final double     FORWARD_SPEED = 0.4;
-    //static final double     TURN_SPEED    = 0.3;
+    static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 0.70588;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
     static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
@@ -103,32 +98,34 @@ public class Scan_Auto_Encode extends LinearOpMode
             }
         });
 
+        telemetry.setMsTransmissionInterval(50);
+        robot.init(hardwareMap);
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
+        telemetry.update(); robot.init(hardwareMap);
+
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Resetting Encoders");    //
         telemetry.update();
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(0, 0, 0);
+        robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.bleftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.brightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        drive.setPoseEstimate(startPose);
+        robot.bleftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.brightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(24*2.54)
-                .waitSeconds(0.5)
-                .turn(Math.toRadians(90))
-                .waitSeconds(0.5)
-                .forward(61/2.022)
-                .build();
-        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(startPose)
-                .forward(24*3)
-                .build();
-        TrajectorySequence traj3 = drive.trajectorySequenceBuilder(startPose)
-                .forward(24*2.54)
-                .waitSeconds(0.5)
-                .turn(Math.toRadians(90) - 1e-6)
-                .waitSeconds(0.5)
-                .forward(61)
-                .build();
+        // Send telemetry message to indicate successful Encoder reset
+        telemetry.addData("Path0",  "Starting at %7d :%7d :%7d :%7d",
+                robot.leftDrive.getCurrentPosition(),
+                robot.rightDrive.getCurrentPosition(),
+                robot.bleftDrive.getCurrentPosition(),
+                robot.brightDrive.getCurrentPosition());
+        telemetry.update();
         /*
          * The INIT-loop:
          * This REPLACES waitForStart!
@@ -209,33 +206,95 @@ public class Scan_Auto_Encode extends LinearOpMode
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
-            /* Actually do something useful */
+
+        /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
-            telemetry.addLine("Going Middle:\n");
-            telemetry.update(); 
-            drive.followTrajectorySequence(traj2);
+            encoderDrive(DRIVE_SPEED,  -28,  -28, 5.0);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
-            telemetry.addLine("Going Left:\n");
-            telemetry.update(); 
-            drive.followTrajectorySequence(traj1);
+            encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
+            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(TURN_SPEED,   18, -18, 4.0);
+            encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
-            telemetry.addLine("Going Middle:\n");
-            telemetry.update(); 
-            drive.followTrajectorySequence(traj2);
+            encoderDrive(DRIVE_SPEED,  -28,  -28, 5.0);
         }else{
             //right trajectory
-            telemetry.addLine("Going Right:\n");
-            telemetry.update(); 
-            drive.followTrajectorySequence(traj3);
-        }  
+            encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
+             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(TURN_SPEED,   -18, 18, 4.0);
+            encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         //while (opModeIsActive()) {sleep(20);}
+    }
 
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = robot.leftDrive.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newRightTarget = robot.rightDrive.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            robot.leftDrive.setTargetPosition(newLeftTarget);
+            robot.rightDrive.setTargetPosition(newRightTarget);
+            robot.bleftDrive.setTargetPosition(newLeftTarget);
+            robot.brightDrive.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bleftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.brightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.leftDrive.setPower(Math.abs(speed));
+            robot.rightDrive.setPower(Math.abs(speed));
+            robot.bleftDrive.setPower(Math.abs(speed));
+            robot.brightDrive.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.leftDrive.isBusy() && robot.rightDrive.isBusy() && robot.bleftDrive.isBusy() && robot.brightDrive.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d :%7d :%7d",
+                        robot.leftDrive.getCurrentPosition(),
+                        robot.rightDrive.getCurrentPosition(),
+                        robot.bleftDrive.getCurrentPosition(),
+                        robot.brightDrive.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.leftDrive.setPower(0);
+            robot.rightDrive.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move
+        }
+    }
     void tagToTelemetry(AprilTagDetection detection)
     {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
