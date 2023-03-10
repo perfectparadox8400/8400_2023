@@ -16,6 +16,7 @@ public class Strafe extends LinearOpMode {
     private DcMotor inta1;
     private DcMotor inta2;
     private DcMotor slide;
+    private DcMotor slided  ;
     private Servo hand;
 
 
@@ -31,6 +32,7 @@ public class Strafe extends LinearOpMode {
         inta1 = hardwareMap.get(DcMotor.class, "inta1");
         inta2 = hardwareMap.get(DcMotor.class, "inta2");
         slide = hardwareMap.get(DcMotor.class, "slide");
+        slided = hardwareMap.get(DcMotor.class, "slided");
         hand = hardwareMap.get(Servo.class, "hand");
         double power;
         double power2;
@@ -69,18 +71,23 @@ public class Strafe extends LinearOpMode {
                 
                 if (gamepad2.dpad_up) {
                     slide.setPower(-1);
+//                    slided.setPower(0.45);
                 } else if (gamepad2.dpad_down) {
                     slide.setPower(1);
+//                    slided.setPower(-1);
                 } else if (gamepad2.left_bumper) {
                     slide.setPower(-0.01);
                 }else{
                     slide.setPower(0);
+//                    slided.setPower(0);
                 }
-
+//                if (gamepad2.right_bumper) {
+//                    slided.setPower(-0.01);
+//                }
                 if (gamepad2.x) {
-                    hand.setPosition(0.55);
+                    hand.setPosition(0.5);
                 } else if (gamepad2.a) {
-                    hand.setPosition(0.7);
+                    hand.setPosition(1);
                 }
                 // Intake
                 if (gamepad1.right_bumper) {

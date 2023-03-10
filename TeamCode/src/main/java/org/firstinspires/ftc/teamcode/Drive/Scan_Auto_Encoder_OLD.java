@@ -48,7 +48,7 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
     private ElapsedTime     runtime = new ElapsedTime();
 
     static final double     COUNTS_PER_MOTOR_REV    = 537.6;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.41667 ;     // This is < 1.0 if geared UP
+    static final double     DRIVE_GEAR_REDUCTION    = 0.70588;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
@@ -210,19 +210,32 @@ public class Scan_Auto_Encoder_OLD extends LinearOpMode
         /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
-            encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
+            encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }else if(tagOfInterest.id == LEFT){
             //left trajectory
-            encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
-            encoderDrive(TURN_SPEED,   12, -12, 4.0);
-            encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
+            encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
+            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(TURN_SPEED,   48, -48, 4.0);
+            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(DRIVE_SPEED,  -6,  -6, 5.0);
+            encoderDrive(TURN_SPEED,   6, -6, 4.0);
+            encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
-            encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
+            encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
+            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(TURN_SPEED,   60, -60, 4.0);
+            encoderDrive(DRIVE_SPEED,  -4,  -4, 5.0);
+            encoderDrive(DRIVE_SPEED,  4,  4, 5.0);
+            encoderDrive(TURN_SPEED,   6, -6, 4.0);
         }else{
             //right trajectory
-            encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
-            encoderDrive(TURN_SPEED,   -12, 12, 4.0);
+            encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
+            encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
+            encoderDrive(TURN_SPEED,   60, -60, 4.0);
+            encoderDrive(DRIVE_SPEED,  -4,  -4, 5.0);
+            encoderDrive(DRIVE_SPEED,  4,  4, 5.0);
+            encoderDrive(TURN_SPEED,   6, -6, 4.0);
             encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
         }
         telemetry.addData("Path", "Complete");
