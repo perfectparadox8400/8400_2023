@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 
 @Autonomous(name="Scan Auto - Encoder Normal")
-public class Scan_Auto_Encoder_OLD extends LinearOpMode
+public class Scan_Auto_Encoder_Normal extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;

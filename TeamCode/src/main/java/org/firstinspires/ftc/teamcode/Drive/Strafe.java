@@ -71,7 +71,7 @@ public class Strafe extends LinearOpMode {
                 if (gamepad2.dpad_up) {
                     slide.setPower(-1);
                 } else if (gamepad2.dpad_down) {
-                    slide.setPower(1);
+                    slide.setPower(0.8);
                 } else if (gamepad2.left_bumper) {
                     slide.setPower(-0.01);
                 }else{
@@ -79,7 +79,7 @@ public class Strafe extends LinearOpMode {
                 }
 
                 if (gamepad2.x) {
-                    hand.setPosition(0.5);
+                    hand.setPosition(0.6);
                 } else if (gamepad2.a) {
                     hand.setPosition(1);
                 }

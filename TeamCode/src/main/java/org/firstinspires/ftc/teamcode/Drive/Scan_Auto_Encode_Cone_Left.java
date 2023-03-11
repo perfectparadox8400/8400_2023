@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 
 @Autonomous(name="Scan Auto - Encoder Cone Left")
-public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
+public class Scan_Auto_Encode_Cone_Left extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -223,7 +223,7 @@ public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
             encoderSlide(1, -2, 5.0);
             encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
             robot.hand.setPosition(1);
-            encoderSlide(0.8, 2, 5.0);
+            encoderSlide(0.8, 1, 5.0);
             robot.slide.setPower(0);
             encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
             encoderDrive(TURN_SPEED,   -6, 6, 4.0);
@@ -236,7 +236,7 @@ public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
             encoderSlide(1, -2, 5.0);
             encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
             robot.hand.setPosition(1);
-            encoderSlide(0.8, 2, 5.0);
+            encoderSlide(0.8, 1, 5.0);
             robot.slide.setPower(0);
             encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
             encoderDrive(TURN_SPEED,   -6, 6, 4.0);
@@ -248,7 +248,7 @@ public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
             encoderSlide(1, -2, 5.0);
             encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
             robot.hand.setPosition(1);
-            encoderSlide(0.8, 2, 5.0);
+            encoderSlide(0.8, 1, 5.0);
             robot.slide.setPower(0);
             encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
             encoderDrive(TURN_SPEED,   -6, 6, 4.0);
@@ -327,7 +327,7 @@ public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
         }
     }
     public void encoderSlide(double speed,
-                             double rotations
+                             double rotations,
                              double timeoutS) {
         int newTarget;
 
@@ -335,7 +335,7 @@ public class Scan_Auto_Encoder_Cone_Left extends LinearOpMode
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newTarget = robot.slide.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newTarget = robot.slide.getCurrentPosition() + (int)(rotations * COUNTS_PER_INCH);
             robot.slide.setTargetPosition(newTarget);
 
             // Turn On RUN_TO_POSITION
