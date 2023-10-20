@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.drive.HardwarePushbot;
+import org.firstinspires.ftc.teamcode.Drive.HardwarePushbot;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -210,7 +210,7 @@ public class Scan_Auto_Encode_Cone_Left extends LinearOpMode
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
-        robot.hand.setPosition(0.5);
+        robot.hand.setPosition(1);
         /* Actually do something useful */
         if(tagOfInterest == null){
             //default trajectory here if preferred
@@ -219,39 +219,72 @@ public class Scan_Auto_Encode_Cone_Left extends LinearOpMode
             //left trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(TURN_SPEED,   48, -48, 4.0);
-            encoderSlide(1, -2, 5.0);
-            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-            robot.hand.setPosition(1);
-            encoderSlide(0.8, 1, 5.0);
+            encoderDrive(TURN_SPEED,   27, -27, 4.0);
+            robot.slide.setPower(-0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.slide.setPower(-0.01);
+            encoderDrive(DRIVE_SPEED,  10,  10, 1.0);
+            robot.slide.setPower(0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.hand.setPosition(0.6);
+            encoderDrive(DRIVE_SPEED,  -10,  -10, 1.0);
+            encoderDrive(TURN_SPEED,   -12, 12, 4.0);
             robot.slide.setPower(0);
-            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
-            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
             encoderDrive(DRIVE_SPEED,  -24,  -24, 5.0);
         }else if(tagOfInterest.id == MIDDLE){
             //middle trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(TURN_SPEED,   48, -48, 4.0);
-            encoderSlide(1, -2, 5.0);
-            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-            robot.hand.setPosition(1);
-            encoderSlide(0.8, 1, 5.0);
+            encoderDrive(TURN_SPEED,   27, -27, 4.0);
+            robot.slide.setPower(-0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.slide.setPower(-0.01);
+            encoderDrive(DRIVE_SPEED,  10,  10, 1.0);
+            robot.slide.setPower(0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.hand.setPosition(0.6);
+            encoderDrive(DRIVE_SPEED,  -10,  -10, 1.0);
+            encoderDrive(TURN_SPEED,   -12, 12, 4.0);
             robot.slide.setPower(0);
-            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
-            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
         }else{
             //right trajectory
             encoderDrive(DRIVE_SPEED,  -34,  -34, 5.0);
             encoderDrive(DRIVE_SPEED,  6,  6, 5.0);
-            encoderDrive(TURN_SPEED,   48, -48, 4.0);
-            encoderSlide(1, -2, 5.0);
-            encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-            robot.hand.setPosition(1);
-            encoderSlide(0.8, 1, 5.0);
+            encoderDrive(TURN_SPEED,   27, -27, 4.0);
+            robot.slide.setPower(-0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.slide.setPower(-0.01);
+            encoderDrive(DRIVE_SPEED,  10,  10, 1.0);
+            robot.slide.setPower(0.8);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
+                telemetry.addData("Slide", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+                telemetry.update();
+            }
+            robot.hand.setPosition(0.6);
+            encoderDrive(DRIVE_SPEED,  -10,  -10, 1.0);
+            encoderDrive(TURN_SPEED,   -11, 11, 4.0);
             robot.slide.setPower(0);
-            encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
-            encoderDrive(TURN_SPEED,   -6, 6, 4.0);
             encoderDrive(DRIVE_SPEED,  24,  24, 5.0);
         }
         telemetry.addData("Path", "Complete");
@@ -352,7 +385,7 @@ public class Scan_Auto_Encode_Cone_Left extends LinearOpMode
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
+                    (runtime.seconds() < timeoutS) ||
                     (robot.slide.isBusy())) {
 
                 // Display it for the driver.
@@ -368,7 +401,7 @@ public class Scan_Auto_Encode_Cone_Left extends LinearOpMode
             // Turn off RUN_TO_POSITION
             robot.slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            sleep(250);   // optional pause after each move
+            //sleep(250);   // optional pause after each move
         }
     }
     void tagToTelemetry(AprilTagDetection detection)

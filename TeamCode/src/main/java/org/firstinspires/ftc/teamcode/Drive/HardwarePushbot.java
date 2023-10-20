@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drive;
+package org.firstinspires.ftc.teamcode.Drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -109,7 +109,7 @@ public class HardwarePushbot
         // Define and initialize ALL installed servos.
         hand  = hwMap.get(Servo.class, "hand");
         //rightClaw = hwMap.get(Servo.class, "right_hand");
-        hand.setPosition(0.5);
+        hand.setPosition(1);
         //rightClaw.setPosition(MID_SERVO);
     }
 }
